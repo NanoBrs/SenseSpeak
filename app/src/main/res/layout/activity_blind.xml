@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Título en la parte superior -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Discapacidad Visual"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Botón Identificar Colores -->
+    <Button
+        android:id="@+id/identifyColorsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Identificar Colores"
+        android:textSize="48sp"
+        android:layout_below="@id/titleTextView"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/black"/>
+
+    <!-- Botón Identificar Billetes -->
+    <Button
+        android:id="@+id/identifyBillsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Identificar Billetes"
+        android:textSize="48sp"
+        android:layout_below="@id/identifyColorsButton"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/black"/>
+
+    <!-- Botón Historial -->
+    <Button
+        android:id="@+id/historyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Historial"
+        android:textSize="48sp"
+        android:layout_below="@id/identifyBillsButton"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/black"/>
+
+    <!-- Botón Volver Atrás -->
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver Atrás"
+        android:textSize="48sp"
+        android:layout_below="@id/historyButton"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/black"/>
+
+    <!-- Texto y Botón "Narrador" -->
+    <LinearLayout
+        android:id="@+id/narratorLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_centerHorizontal="true">
+
+        <!-- Texto "Narrador" -->
+        <TextView
+            android:id="@+id/narratorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Narrador:"
+            android:textSize="48sp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Botón On/Off -->
+        <ToggleButton
+            android:id="@+id/narratorToggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textOff="Off"
+            android:textOn="On"
+            android:textSize="22sp" />
+    </LinearLayout>
+</RelativeLayout>

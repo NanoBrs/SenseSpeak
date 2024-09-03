@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <!-- PreviewView para mostrar la vista de la cámara -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- Puntero en el centro -->
+    <View
+        android:id="@+id/colorPointer"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/pointer"
+        android:layout_centerInParent="true"/>
+
+    <!-- Botón para tomar la foto -->
+    <Button
+        android:id="@+id/captureButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capture"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Texto para mostrar el color identificado -->
+    <TextView
+        android:id="@+id/colorTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/captureButton"
+        android:layout_centerHorizontal="true"
+        android:textSize="18sp"
+        android:text="Color: #000000"/>
+</RelativeLayout>
