@@ -1,5 +1,6 @@
 package com.lucianoberriosdev.mycamera;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,12 +11,12 @@ import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -25,6 +26,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageCapture imageCapture;
     private Executor executor;
     private TextView colorTextView;
+    private NarratorManager narratorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,27 +47,44 @@ public class MainActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.previewView);
         colorTextView = findViewById(R.id.colorTextView);
+        ToggleButton narratorToggleButton = findViewById(R.id.narratorToggleButton);
 
         executor = Executors.newSingleThreadExecutor();
+        narratorManager = NarratorManager.getInstance(this);
 
-        // Check and request permissions
+        // Load narrator state from preferences
+        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        boolean isNarratorEnabled = prefs.getBoolean("narratorEnabled", false);
+        narratorToggleButton.setChecked(isNarratorEnabled);
+
+        narratorToggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                narratorManager.enableNarrator();
+                speak("Narrador activado");
+            } else {
+                narratorManager.disableNarrator();
+                speak("Narrador desactivado");
+            }
+            // Save narrator state to preferences
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("narratorEnabled", isChecked);
+            editor.apply();
+        });
+
         checkPermissions();
-
-        // Set up the CameraX configuration
         setUpCameraX();
 
         Button captureButton = findViewById(R.id.captureButton);
-        captureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePhoto();
-            }
-        });
+        captureButton.setOnClickListener(v -> takePhoto());
+    }
+
+    private void speak(String text) {
+        if (narratorManager.isNarratorEnabled()) {
+            narratorManager.speak(text);
+        }
     }
 
     private void checkPermissions() {
-        // Check if permissions are granted and request if needed
-        // This is a simplified check for demonstration
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -78,12 +98,11 @@ public class MainActivity extends AppCompatActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                Preview preview = new Preview.Builder()
-                        .build();
+                Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 CameraSelector cameraSelector = new CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK) // Change to FRONT for front camera
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                         .build();
 
                 imageCapture = new ImageCapture.Builder()
@@ -101,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void takePhoto() {
         if (imageCapture != null) {
-            // Save photo to the app's specific directory
             File photoFile = new File(getExternalFilesDir(null), "photo_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg");
 
             ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
@@ -122,32 +140,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void analyzeColor(File photoFile) {
-        // Decodificar el bitmap fuera del UI thread
         Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
 
         if (bitmap != null) {
             int color = bitmap.getPixel(bitmap.getWidth() / 2, bitmap.getHeight() / 2);
             String hexColor = String.format("#%06X", (0xFFFFFF & color));
 
-            // Identificar el color
             String colorName = identifyColor(hexColor);
 
             Log.d(TAG, "Dominant color detected: " + hexColor + " (" + colorName + ")");
 
-            // Ahora actualizar la UI en el hilo principal
             runOnUiThread(() -> {
-                colorTextView.setText("Color: " + colorName + " (" + hexColor + ")");
+                String textToSpeak = "Color: " + colorName + " (" + hexColor + ")";
+                colorTextView.setText(textToSpeak);
+                speak(textToSpeak);
             });
+
         } else {
             Log.e(TAG, "Failed to load bitmap.");
         }
     }
 
-
     private String identifyColor(String hexColor) {
         int color = Color.parseColor(hexColor);
 
-        // Colores base
         int rojo = Color.parseColor("#FF0000");
         int azul = Color.parseColor("#0000FF");
         int amarillo = Color.parseColor("#FFFF00");
@@ -156,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
         int morado = Color.parseColor("#800080");
         int cafe = Color.parseColor("#8B4513");
 
-        // Comparar con los colores base
         String closestColorName = "Desconocido";
         double closestDistance = Double.MAX_VALUE;
 
@@ -184,4 +199,19 @@ public class MainActivity extends AppCompatActivity {
 
         return Math.sqrt(Math.pow(r2 - r1, 2) + Math.pow(g2 - g1, 2) + Math.pow(b2 - b1, 2));
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Verificar el estado del narrador en SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        boolean isNarratorEnabled = prefs.getBoolean("narratorEnabled", false);
+
+        if (isNarratorEnabled) {
+            narratorManager.enableNarrator();
+        } else {
+            narratorManager.disableNarrator();
+        }
+    }
 }
+

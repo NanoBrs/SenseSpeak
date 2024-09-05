@@ -19,6 +19,18 @@
         android:background="@drawable/pointer"
         android:layout_centerInParent="true"/>
 
+    <!-- Texto para mostrar el color identificado -->
+    <TextView
+        android:id="@+id/colorTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textSize="40sp"
+        android:text="Color: #000000"/>
+
     <!-- Botón para tomar la foto -->
     <Button
         android:id="@+id/captureButton"
@@ -27,14 +39,13 @@
         android:text="Capture"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
-
-    <!-- Texto para mostrar el color identificado -->
-    <TextView
-        android:id="@+id/colorTextView"
+    <ToggleButton
+        android:id="@+id/narratorToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/captureButton"
-        android:layout_centerHorizontal="true"
-        android:textSize="18sp"
-        android:text="Color: #000000"/>
+        android:textOn="Narrator On"
+        android:textOff="Narrator Off"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
 </RelativeLayout>
+

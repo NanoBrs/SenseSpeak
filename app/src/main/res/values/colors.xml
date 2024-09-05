@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Color del fondo del botón cuando no está presionado -->
+    <color name="red_default">#FF0000</color>
+    <!-- Color del fondo del botón cuando está presionado -->
+    <color name="red_pressed">#CC0000</color>
+    <!-- Otros colores -->
 </resources>
