@@ -23,10 +23,14 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -39,11 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private Executor executor;
     private TextView colorTextView;
     private NarratorManager narratorManager;
-
+    private FirebaseFirestore db;
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        db = FirebaseFirestore.getInstance();
 
         previewView = findViewById(R.id.previewView);
         colorTextView = findViewById(R.id.colorTextView);
@@ -154,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 String textToSpeak = "Color: " + colorName + " (" + hexColor + ")";
                 colorTextView.setText(textToSpeak);
                 speak(textToSpeak);
+                saveColorToFirestore(colorName, hexColor);
             });
 
         } else {
@@ -213,5 +221,17 @@ public class MainActivity extends AppCompatActivity {
             narratorManager.disableNarrator();
         }
     }
-}
+    private void saveColorToFirestore(String colorName, String hexColor) {
+        // Create a map to hold the color data
+        Map<String, Object> colorData = new HashMap<>();
+        colorData.put("Tipo", "Color");
+        colorData.put("fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        colorData.put("valor", colorName);
 
+        // Add a new document with a generated ID
+        db.collection("historial").add(colorData)
+                .addOnSuccessListener(documentReference -> Log.d(TAG, "Color data saved successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error saving color data", e));
+    }
+
+}

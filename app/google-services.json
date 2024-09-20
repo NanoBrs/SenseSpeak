@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "959681520752",
+    "project_id": "sensespeak-6c778",
+    "storage_bucket": "sensespeak-6c778.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959681520752:android:69f766dcc0db8eeac380b5",
+        "android_client_info": {
+          "package_name": "com.lucianoberriosdev.mycamera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9nxVJKUJVWHOCJb1k-RsUNeDNVOVV0hM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
