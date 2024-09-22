@@ -47,11 +47,15 @@
 
         <activity android:name=".DeafActivity"
             android:exported="false"
-            ></activity>
+            />
 
         <activity android:name=".VoiceActivity"
             android:exported="false"
-            ></activity>
+            />
+
+        <activity android:name=".BillIdentifierActivity"
+        android:exported="false"
+        />
 
     </application>
 

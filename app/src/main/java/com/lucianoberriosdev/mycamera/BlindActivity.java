@@ -73,7 +73,7 @@ public class BlindActivity extends AppCompatActivity {
         });
 
         currencyButton.setOnClickListener(v -> {
-            Intent intent = new Intent(BlindActivity.this, MainActivity.class);
+            Intent intent = new Intent(BlindActivity.this, BillIdentifierActivity.class);
             startActivity(intent);
         });
 

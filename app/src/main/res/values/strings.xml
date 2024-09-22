@@ -2,5 +2,6 @@
     <string name="app_name">MyCamera</string>
     <string name="btnCamara">Camara</string>
     <string name="iv_visor">Visor</string>
+    <string name="billete_detectado">Billete Detectado</string>
 
 </resources>
