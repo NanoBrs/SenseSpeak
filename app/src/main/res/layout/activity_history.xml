@@ -1,0 +1,72 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvHistoryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Historial"
+        android:textSize="45sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/Explain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ultimos 15 valores registrados:"
+        android:textSize="25sp"
+        android:paddingBottom="16dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TableLayout
+        android:id="@+id/tableHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1">
+
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:textSize="30sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:textSize="30sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Valor"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:textSize="30sp"/>
+        </TableRow>
+
+        <!-- Aquí se insertarán dinámicamente las filas de datos -->
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Volver atrás"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:textSize="30sp"/>
+
+</LinearLayout>

@@ -22,12 +22,24 @@ public class VoiceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_voice_to_text);
+        setContentView(R.layout.activity_voice_to_text); // Asegúrate de que el nombre del layout XML sea correcto
 
         voiceResultTextView = findViewById(R.id.voiceResultTextView);
         Button startVoiceRecognitionButton = findViewById(R.id.startVoiceRecognitionButton);
+        Button historyButton = findViewById(R.id.historyButton);
+        Button backButton = findViewById(R.id.backButton);
 
+        // Iniciar reconocimiento de voz
         startVoiceRecognitionButton.setOnClickListener(v -> startVoiceRecognition());
+
+        // Ir a la actividad de Historial
+        historyButton.setOnClickListener(v -> {
+            Intent intent = new Intent(VoiceActivity.this, HistoryActivity.class);
+            startActivity(intent);
+        });
+
+        // Volver atrás
+        backButton.setOnClickListener(v -> onBackPressed());
     }
 
     // Método para iniciar el reconocimiento de voz
@@ -53,4 +65,3 @@ public class VoiceActivity extends AppCompatActivity {
         }
     }
 }
-

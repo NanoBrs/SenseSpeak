@@ -1,3 +1,3 @@
-0 Cinco mil
-1 Diez Mil
+0 Mil pesos
+1 Diez mil Pesos
 2 No identificado

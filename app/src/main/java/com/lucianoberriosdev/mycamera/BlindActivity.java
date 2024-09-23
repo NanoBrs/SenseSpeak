@@ -78,7 +78,7 @@ public class BlindActivity extends AppCompatActivity {
         });
 
         historyButton.setOnClickListener(v -> {
-            Intent intent = new Intent(BlindActivity.this, SenseSpeakActivity.class);
+            Intent intent = new Intent(BlindActivity.this, HistoryActivity.class);
             startActivity(intent);
         });
 

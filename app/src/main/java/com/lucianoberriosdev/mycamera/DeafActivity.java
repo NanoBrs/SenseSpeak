@@ -23,14 +23,11 @@ public class DeafActivity extends AppCompatActivity {
             Intent intent = new Intent(DeafActivity.this, VoiceActivity.class);
             startActivity(intent);
         });
-        Button alarmsButton = findViewById(R.id.alarmsButton);
-        alarmsButton.setOnClickListener(v -> {
-            // Implementación del comportamiento de Alarmas
-        });
 
         Button historyButton = findViewById(R.id.historyButton);
         historyButton.setOnClickListener(v -> {
-            // Implementación del comportamiento del Historial
+            Intent intent = new Intent(DeafActivity.this, HistoryActivity.class);
+            startActivity(intent);
         });
 
         Button backButton = findViewById(R.id.backButton);
