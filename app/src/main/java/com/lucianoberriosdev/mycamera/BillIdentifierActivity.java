@@ -1,12 +1,15 @@
 package com.lucianoberriosdev.mycamera;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -27,6 +30,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 import org.tensorflow.lite.Interpreter;
 
+
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
@@ -50,6 +56,7 @@ import java.util.concurrent.Executors;
 public class BillIdentifierActivity extends AppCompatActivity {
 
     private static final String TAG = "BillIdentifierActivity";
+    private static final int PICK_IMAGE_REQUEST = 1; // Código de solicitud para la galería
     private PreviewView previewView;
     private ImageCapture imageCapture;
     private Executor executor;
@@ -57,6 +64,7 @@ public class BillIdentifierActivity extends AppCompatActivity {
     private Interpreter tflite;
     private FirebaseFirestore db;
     private ToggleButton narratorToggleButton;
+
     private NarratorManager narratorManager;
     private List<String> labels;
 
@@ -103,8 +111,13 @@ public class BillIdentifierActivity extends AppCompatActivity {
         checkPermissions();
         setUpCameraX();
 
+        // Botón para capturar imagen
         Button captureButton = findViewById(R.id.captureButton);
         captureButton.setOnClickListener(v -> takePhoto());
+
+        // Botón para seleccionar imagen desde la galería
+        Button galleryButton = findViewById(R.id.galleryButton);
+        galleryButton.setOnClickListener(v -> openGallery());
     }
 
     private void speak(String text) {
@@ -119,6 +132,12 @@ public class BillIdentifierActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.CAMERA},
                     100);
+        }
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    101);
         }
     }
 
@@ -136,6 +155,7 @@ public class BillIdentifierActivity extends AppCompatActivity {
 
                 imageCapture = new ImageCapture.Builder()
                         .setTargetResolution(new Size(640, 480))
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .build();
 
                 cameraProvider.unbindAll();
@@ -157,7 +177,7 @@ public class BillIdentifierActivity extends AppCompatActivity {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.d(TAG, "Photo capture succeeded: " + outputFileResults.getSavedUri());
-                    analyzeBill(photoFile);
+                    analyzeBill(photoFile); // Cambiado a analizar desde la ruta del archivo
                 }
 
                 @Override
@@ -168,9 +188,33 @@ public class BillIdentifierActivity extends AppCompatActivity {
         }
     }
 
-    private void analyzeBill(File photoFile) {
-        Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+    // Método para abrir la galería
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            analyzeBillFromGallery(imageUri);
+        }
+    }
+
+    private void analyzeBillFromGallery(Uri imageUri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            analyzeBill(bitmap);
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading image from gallery", e);
+        }
+    }
+
+    // Análisis del billete a partir del bitmap
+    private void analyzeBill(Bitmap bitmap) {
         if (bitmap != null) {
             String billDetected = identifyBillUsingModel(bitmap);
 
@@ -197,7 +241,7 @@ public class BillIdentifierActivity extends AppCompatActivity {
         tflite.run(inputBuffer, output);
 
         // Identificar el índice de la clase predicha y el nombre correspondiente
-        int predictedClassIndex = getPredictedClassIndex(output[0]); // Implementa la lógica para encontrar el índice con mayor confianza
+        int predictedClassIndex = getPredictedClassIndex(output[0]);
         return labels.get(predictedClassIndex); // Asegúrate de que labels esté cargado correctamente
     }
 
@@ -215,18 +259,56 @@ public class BillIdentifierActivity extends AppCompatActivity {
 
     private ByteBuffer preprocessImage(Bitmap bitmap) {
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 224 * 224 * 3);
+        byteBuffer.order(ByteOrder.nativeOrder());
         byteBuffer.rewind();
 
         for (int y = 0; y < 224; y++) {
             for (int x = 0; x < 224; x++) {
                 int pixel = bitmap.getPixel(x, y);
-
-                byteBuffer.putFloat(((pixel >> 16) & 0xFF) / 255.f);
-                byteBuffer.putFloat(((pixel >> 8) & 0xFF) / 255.f);
-                byteBuffer.putFloat((pixel & 0xFF) / 255.f);
+                byteBuffer.putFloat(((pixel >> 16) & 0xFF) / 255.0f);
+                byteBuffer.putFloat(((pixel >> 8) & 0xFF) / 255.0f);
+                byteBuffer.putFloat((pixel & 0xFF) / 255.0f);
             }
         }
         return byteBuffer;
+    }
+
+    // Método para analizar el archivo de foto capturado por la cámara
+    private void analyzeBill(File photoFile) {
+        if (photoFile.exists()) {
+            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+            analyzeBill(bitmap);
+        } else {
+            Log.e(TAG, "Photo file doesn't exist.");
+        }
+    }
+
+    private void saveBillToFirestore(String billDetected) {
+        Map<String, String> data = new HashMap<>();
+        data.put("Tipo", "Billete");
+        data.put("valor", billDetected);
+        data.put("fecha", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+        db.collection("historial")
+                .add(data)
+                .addOnSuccessListener(documentReference -> Log.d(TAG, "Billete guardado con ID: " + documentReference.getId()))
+                .addOnFailureListener(e -> Log.e(TAG, "Error al guardar el billete", e));
+    }
+
+    private List<String> loadLabels() {
+        List<String> labels = new ArrayList<>();
+        try {
+            InputStream is = getAssets().open("labels.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                labels.add(line.trim());
+            }
+            reader.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Error loading labels", e);
+        }
+        return labels;
     }
 
     private MappedByteBuffer loadModelFile() throws IOException {
@@ -238,42 +320,11 @@ public class BillIdentifierActivity extends AppCompatActivity {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    private List<String> loadLabels() {
-        List<String> labels = new ArrayList<>();
-        try (InputStream is = getAssets().open("labels.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                labels.add(line.trim());
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading labels", e);
-        }
-        return labels;
-    }
-
-    private void saveBillToFirestore(String billDetected) {
-        Map<String, Object> billData = new HashMap<>();
-        billData.put("Tipo", "Billete");
-        billData.put("fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
-        billData.put("valor", billDetected);
-
-        db.collection("historial").add(billData)
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "Datos del billete guardados exitosamente"))
-                .addOnFailureListener(e -> Log.e(TAG, "Error guardando datos del billete", e));
-    }
-
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Verificar el estado del narrador en SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        boolean isNarratorEnabled = prefs.getBoolean("narratorEnabled", false);
-
-        if (isNarratorEnabled) {
-            narratorManager.enableNarrator();
-        } else {
-            narratorManager.disableNarrator();
+    protected void onDestroy() {
+        super.onDestroy();
+        if (tflite != null) {
+            tflite.close();
         }
     }
 }

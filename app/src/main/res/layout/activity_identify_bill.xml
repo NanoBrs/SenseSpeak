@@ -1,42 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <!-- Vista previa de la cámara -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-    <!-- Texto para mostrar el resultado del billete identificado -->
     <TextView
         android:id="@+id/billTextView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:textSize="24sp"
-        android:textColor="#FFFFFF"
-        android:background="#80000000" />
+        android:layout_height="wrap_content"/>
 
-    <!-- Botón para capturar la imagen -->
-    <Button
-        android:id="@+id/captureButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:layout_toRightOf="@id/billTextView"
-        android:text="Capturar" />
-
-    <!-- Toggle para activar/desactivar el narrador -->
     <ToggleButton
         android:id="@+id/narratorToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
-        android:textOff="Narrador: Desactivado"
-        android:textOn="Narrador: Activado" />
-</RelativeLayout>
+        android:text="Narrador"/>
+
+    <Button
+        android:id="@+id/captureButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capturar Imagen"/>
+
+    <Button
+        android:id="@+id/galleryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar de la Galería"/>
+</LinearLayout>

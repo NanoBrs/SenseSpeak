@@ -45,6 +45,11 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".MainActivity2"
+            android:exported="false" />
+
+
         <activity android:name=".DeafActivity"
             android:exported="false"
             />

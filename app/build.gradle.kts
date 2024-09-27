@@ -30,6 +30,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    packaging {
+        resources {
+            // Evita que los archivos .tflite se compriman
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "*.tflite"
+        }
+    }
+
+
+    buildFeatures{
+        viewBinding = true
+        mlModelBinding = true
+    }
+
 }
 
 dependencies {
@@ -39,6 +53,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.support.annotations)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.tensorflow.lite.metadata)
+    implementation(libs.tensorflow.lite.gpu)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -50,5 +66,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.support)
+    implementation(libs.camera.x.library)
+
 
 }
