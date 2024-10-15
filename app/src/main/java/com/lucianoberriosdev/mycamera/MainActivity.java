@@ -168,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "Failed to load bitmap.");
         }
     }
-
     private String identifyColor(String hexColor) {
         int color = Color.parseColor(hexColor);
 
+        // Definir más colores
         int rojo = Color.parseColor("#FF0000");
         int azul = Color.parseColor("#0000FF");
         int amarillo = Color.parseColor("#FFFF00");
@@ -179,13 +179,41 @@ public class MainActivity extends AppCompatActivity {
         int blanco = Color.parseColor("#FFFFFF");
         int morado = Color.parseColor("#800080");
         int cafe = Color.parseColor("#8B4513");
+        int verde = Color.parseColor("#008000");
+        int naranja = Color.parseColor("#FFA500");
+        int rosa = Color.parseColor("#FFC0CB");
+        int gris = Color.parseColor("#808080");
+        int cyan = Color.parseColor("#00FFFF");
+        int violeta = Color.parseColor("#EE82EE");
+        int plata = Color.parseColor("#C0C0C0");
+        int oro = Color.parseColor("#FFD700");
+        int marron = Color.parseColor("#A52A2A");
+        int lima = Color.parseColor("#00FF00");
+        int aqua = Color.parseColor("#00FFFF");
+        int fucsia = Color.parseColor("#FF00FF");
+        int oliva = Color.parseColor("#808000");
+        int lavanda = Color.parseColor("#E6E6FA");
+        int turquesa = Color.parseColor("#40E0D0");
+        int coral = Color.parseColor("#FF7F50");
+        int salmon = Color.parseColor("#FA8072");
+        int granate = Color.parseColor("#800000");
+        int azulMarino = Color.parseColor("#000080");
+        int celeste = Color.parseColor("#87CEEB");
 
         String closestColorName = "Desconocido";
         double closestDistance = Double.MAX_VALUE;
 
-        int[] baseColors = {rojo, azul, amarillo, negro, blanco, morado, cafe};
-        String[] colorNames = {"Rojo", "Azul", "Amarillo", "Negro", "Blanco", "Morado", "Café"};
+        // Ampliar el arreglo de colores base
+        int[] baseColors = {
+                rojo, azul, amarillo, negro, blanco, morado, cafe, verde, naranja, rosa, gris, cyan,
+                violeta, plata, oro, marron, lima, aqua, fucsia, oliva, lavanda, turquesa, coral, salmon, granate, azulMarino, celeste
+        };
+        String[] colorNames = {
+                "Rojo", "Azul", "Amarillo", "Negro", "Blanco", "Morado", "Café", "Verde", "Naranja", "Rosa", "Gris", "Cian",
+                "Violeta", "Plata", "Oro", "Marrón", "Lima", "Aqua", "Fucsia", "Oliva", "Lavanda", "Turquesa", "Coral", "Salmón", "Granate", "Azul Marino", "Celeste"
+        };
 
+        // Buscar el color más cercano
         for (int i = 0; i < baseColors.length; i++) {
             double distance = calculateColorDistance(color, baseColors[i]);
             if (distance < closestDistance) {
