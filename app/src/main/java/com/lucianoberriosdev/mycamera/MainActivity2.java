@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.lucianoberriosdev.mycamera.ml.Model;
 
 import org.tensorflow.lite.DataType;
@@ -25,6 +26,11 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -34,12 +40,12 @@ public class MainActivity2 extends AppCompatActivity {
     ToggleButton narratorToggleButton;
     int imageSize = 224;
     NarratorManager narratorManager;
-
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bill2);
-
+        db = FirebaseFirestore.getInstance();
         result = findViewById(R.id.result);
         confidence = findViewById(R.id.confidence);
         imageView = findViewById(R.id.imageView);
@@ -131,7 +137,7 @@ public class MainActivity2 extends AppCompatActivity {
                 s += String.format("%s: %.1f%%\n", classes[i], confidences[i] * 100);
             }
             confidence.setText(s);
-
+            saveToFirebase(identifiedBill);
             // Narrar el resultado si el narrador está activado
             if (narratorToggleButton.isChecked()) {
                 narratorManager.speak("Billete identificado: " + identifiedBill);
@@ -142,6 +148,25 @@ public class MainActivity2 extends AppCompatActivity {
         } catch (IOException e) {
             // TODO Handle the exception
         }
+    }
+    private void saveToFirebase(String identifiedBill) {
+        // Crear un mapa con los datos
+        Map<String, Object> billData = new HashMap<>();
+        billData.put("Tipo", "Billete");
+        billData.put("valor", identifiedBill);
+        billData.put("fecha", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+        // Guardar en Firestore en la colección 'historial'
+        db.collection("historial")
+                .add(billData)
+                .addOnSuccessListener(documentReference -> {
+                    // Guardado exitoso
+                    narratorManager.speak("Datos guardados en el historial");
+                })
+                .addOnFailureListener(e -> {
+                    // Error al guardar
+                    narratorManager.speak("Error al guardar en el historial");
+                });
     }
 
     @Override

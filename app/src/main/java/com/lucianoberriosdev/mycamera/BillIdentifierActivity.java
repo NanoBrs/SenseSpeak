@@ -284,15 +284,27 @@ public class BillIdentifierActivity extends AppCompatActivity {
     }
 
     private void saveBillToFirestore(String billDetected) {
+        // Crear un mapa para los datos que se van a guardar en Firebase
         Map<String, String> data = new HashMap<>();
-        data.put("Tipo", "Billete");
-        data.put("valor", billDetected);
-        data.put("fecha", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
+        // Agregar los campos necesarios
+        data.put("Tipo", "Billete"); // El tipo es Billete
+        data.put("fecha", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())); // Fecha actual
+        data.put("valor", billDetected); // El valor del billete detectado
+
+        // Guardar los datos en la colección 'historial' de Firebase
         db.collection("historial")
-                .add(data)
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "Billete guardado con ID: " + documentReference.getId()))
-                .addOnFailureListener(e -> Log.e(TAG, "Error al guardar el billete", e));
+                .add(data) // Añadir el mapa de datos
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Billete guardado con ID: " + documentReference.getId());
+                    // Mensaje adicional opcional para indicar que los datos se han guardado correctamente
+                    runOnUiThread(() -> speak("Billete guardado exitosamente"));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al guardar el billete", e);
+                    // Mensaje adicional opcional para indicar el fallo
+                    runOnUiThread(() -> speak("Error al guardar el billete"));
+                });
     }
 
     private List<String> loadLabels() {
@@ -319,6 +331,7 @@ public class BillIdentifierActivity extends AppCompatActivity {
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
+
 
     @Override
     protected void onDestroy() {

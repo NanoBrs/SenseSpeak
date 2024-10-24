@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         // Create a map to hold the color data
         Map<String, Object> colorData = new HashMap<>();
         colorData.put("Tipo", "Color");
-        colorData.put("fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        colorData.put("fecha", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
         colorData.put("valor", colorName);
 
         // Add a new document with a generated ID

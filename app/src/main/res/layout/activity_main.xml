@@ -33,10 +33,11 @@
 
     <!-- Botón para tomar la foto -->
     <Button
+        android:textSize="40sp"
         android:id="@+id/captureButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Capture"
+        android:text="Capturar"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
     <ToggleButton
